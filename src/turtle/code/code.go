@@ -1,6 +1,7 @@
 package code
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 )
@@ -11,7 +12,6 @@ type Opcode byte
 
 const (
 	OpConstant Opcode = iota
-	OpAdd
 )
 
 type Definition struct {
@@ -58,4 +58,55 @@ func Make(op Opcode, operands ...int) []byte {
 	}
 
 	return instruction
+}
+
+func ReadOperands(def *Definition, instruction Instructions) ([]int, int) {
+	operands := make([]int, len(def.OperandWidths))
+	offset := 0
+
+	for i, width := range def.OperandWidths {
+		switch width {
+		case 2:
+			operands[i] = int(ReadUint16(instruction[offset:]))
+		}
+		offset += width
+	}
+	return operands, offset
+}
+
+func ReadUint16(instruction Instructions) uint16 {
+	return binary.BigEndian.Uint16(instruction)
+}
+
+func (instruction Instructions) String() string {
+	var out bytes.Buffer
+	// if errr, fmt.Printf(&out, "ERROR: %s\n", err)
+	i := 0
+	for i < len(instruction) {
+		def, err := Lookup(instruction[i])
+		if err != nil {
+			fmt.Fprintf(&out, "ERROR: %s\n", err)
+		}
+
+		operands, read := ReadOperands(def, instruction[i+1:])
+		fmt.Fprintf(&out, "%04d %s\n", i, instruction.fmtInstruction(def, operands))
+
+		i += 1 + read
+	}
+
+	return out.String()
+}
+
+func (ins Instructions) fmtInstruction(def *Definition, operands []int) string {
+	operandCount := len(operands)
+	if operandCount != len(def.OperandWidths) {
+		return fmt.Sprintf("ERROR: operand len %d does not match defined %d\n", len(operands), operandCount)
+	}
+
+	switch operandCount {
+	case 1:
+		return fmt.Sprintf("%s %d", def.Name, operands[0])
+	}
+
+	return fmt.Sprintf("ERROR: unhandled operandCount for %s\n", def.Name)
 }
