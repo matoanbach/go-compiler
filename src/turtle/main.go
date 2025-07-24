@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
+	"os"
+	"turtle/repl"
 )
 
 func main() {
-	fmt.Printf("Hello World!\n")
+	repl.Start(os.Stdin, os.Stdout)
 }

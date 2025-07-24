@@ -49,7 +49,10 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 		}
 
 		// get the first element in the stack
-		stackElem := vm.StackTop()
+		// stackElem := vm.StackTop()
+		// testExpectedObject(t, tt.expected, stackElem)
+
+		stackElem := vm.LastPoppedStackElem()
 		testExpectedObject(t, tt.expected, stackElem)
 	}
 }
