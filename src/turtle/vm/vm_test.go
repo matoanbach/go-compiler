@@ -17,9 +17,15 @@ type vmTestCase struct {
 
 func TestIntegerArithmetic(t *testing.T) {
 	tests := []vmTestCase{
-		// {"1", 1},
-		// {"2", 2},
-		{"1 + 2", 3}, // the first element in the stack, later expected to be the result of 1 + 2
+		{"1", 1},
+		{"2", 2},
+		{"1 + 2", 3},
+		{"2 * 3", 6},
+		{"8 / 4", 2},
+		{"50 - 2 - 2 + 4", 50},
+		{"5 + 5 + 2 + 1", 13},
+		{"5 * 2 * 2 * 2", 40},
+		{"5 * (2 + 2)", 20},
 	}
 
 	runVmTests(t, tests)
@@ -41,7 +47,7 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 		}
 		// init the vm (not implemented yet)
 		vm := New(comp.Bytecode())
-		fmt.Printf("runVmTests: %q", vm.instructions)
+		fmt.Printf("runVmTests: %q\n", vm.instructions)
 		// run the vm
 		err = vm.Run()
 		if err != nil {
