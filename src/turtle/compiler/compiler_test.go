@@ -92,6 +92,56 @@ func TestBooleanExpressions(t *testing.T) {
 				code.Make(code.OpPop),
 			},
 		},
+		{
+			input:             "3 > 4",
+			expectedConstants: []interface{}{3, 4},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpGreaterThan),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input:             "3 < 4",
+			expectedConstants: []interface{}{4, 3},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpGreaterThan),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input:             "1 == 2",
+			expectedConstants: []interface{}{1, 2},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpEqual),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input:             "2 != 1",
+			expectedConstants: []interface{}{2, 1},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpNotEqual),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input:             "true != false",
+			expectedConstants: []interface{}{},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpTrue),
+				code.Make(code.OpFalse),
+				code.Make(code.OpNotEqual),
+				code.Make(code.OpPop),
+			},
+		},
 	}
 	runCompilerTests(t, tests)
 }
@@ -151,12 +201,12 @@ func concatInstructions(instructions []code.Instructions) code.Instructions {
 func testInstructions(expected []code.Instructions, actual code.Instructions) error {
 	concatted := concatInstructions(expected)
 	if len(concatted) != len(actual) {
-		return fmt.Errorf("wrong number of instructions. expected=%q, got=%q", concatted, actual)
+		return fmt.Errorf("wrong number of instructions. \nexpected=%q\n got=%q\n", concatted, actual)
 	}
 
 	for i, ins := range concatted {
 		if ins != actual[i] {
-			return fmt.Errorf("wrong instruction at %d. expected=%v, got=%v", i, concatted[i], expected[i])
+			return fmt.Errorf("wrong instruction at %d. \nexpected=%v\n got=%v\n", i, concatted[i], expected[i])
 		}
 	}
 
@@ -165,7 +215,7 @@ func testInstructions(expected []code.Instructions, actual code.Instructions) er
 
 func testConstants(t *testing.T, expected []interface{}, actual []object.Object) error {
 	if len(expected) != len(actual) {
-		return fmt.Errorf("wrong number of constants. expected=%d, got=%d", len(expected), len(actual))
+		return fmt.Errorf("wrong number of constants. \nexpected=%d, %q\n got=%d\n", len(expected), expected, len(actual))
 	}
 
 	for i, constant := range expected {
