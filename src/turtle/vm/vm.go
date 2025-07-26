@@ -65,6 +65,18 @@ func (vm *VM) Run() error {
 				return err
 			}
 
+		case code.OpBang:
+			err := vm.executeBangOperator()
+			if err != nil {
+				return err
+			}
+
+		case code.OpMinus:
+			err := vm.executeMinusOperator()
+			if err != nil {
+				return err
+			}
+
 		case code.OpTrue:
 			err := vm.push(True)
 			if err != nil {
@@ -83,6 +95,31 @@ func (vm *VM) Run() error {
 
 	}
 	return nil
+}
+
+func (vm *VM) executeMinusOperator() error {
+	right := vm.pop()
+	if right.Type() != object.INTEGER_OBJ {
+		return fmt.Errorf("unsupported type for negatiion: %s", right.Type())
+	}
+
+	rightValue := right.(*object.Integer).Value
+	if rightValue == 0 {
+		return vm.push(right)
+	}
+	return vm.push(&object.Integer{Value: -rightValue})
+}
+
+func (vm *VM) executeBangOperator() error {
+	right := vm.pop()
+	switch right {
+	case True:
+		return vm.push(False)
+	case False:
+		return vm.push(True)
+	default:
+		return vm.push(False)
+	}
 }
 
 func (vm *VM) executeComparison(op code.Opcode) error {
