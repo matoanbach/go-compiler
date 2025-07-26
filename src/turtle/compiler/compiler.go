@@ -84,12 +84,27 @@ func (c *Compiler) Compile(node ast.Node) error {
 		case ">":
 			c.emit(code.OpGreaterThan)
 		default:
-			return fmt.Errorf("unkwown operator %s", node.Operator)
+			return fmt.Errorf("unknown operator %s", node.Operator)
 		}
 
 	case *ast.IntegerLiteral:
 		integer := &object.Integer{Value: node.Value}
 		c.emit(code.OpConstant, c.addConstant(integer))
+
+	case *ast.PrefixExpression:
+		err := c.Compile(node.Right)
+		if err != nil {
+			return err
+		}
+
+		switch node.Operator {
+		case "-":
+			c.emit(code.OpMinus)
+		case "!":
+			c.emit(code.OpBang)
+		default:
+			return fmt.Errorf("unknown operator %s", node.Operator)
+		}
 	}
 	return nil
 }
