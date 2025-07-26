@@ -26,6 +26,10 @@ func TestIntegerArithmetic(t *testing.T) {
 		{"5 + 5 + 2 + 1", 13},
 		{"5 * 2 * 2 * 2", 40},
 		{"5 * (2 + 2)", 20},
+		{"-5", -5},
+		{"-10", -10},
+		{"-50 + 100 + -50", 0},
+		{"(5 + 10 * 2 + 15 / 3) * 2 + -10", 50},
 	}
 
 	runVmTests(t, tests)
@@ -50,6 +54,12 @@ func TestBooleanExpressions(t *testing.T) {
 		{"(1 < 2) == false", false},
 		{"(1 > 2) == true", false},
 		{"(1 > 2) == false", true},
+		{"!true", false},
+		{"!false", true},
+		{"!5", false},
+		{"!!true", true},
+		{"!!false", false},
+		{"!!5", true},
 	}
 
 	runVmTests(t, tests)
@@ -72,7 +82,7 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 		}
 		// init the vm (not implemented yet)
 		vm := New(comp.Bytecode())
-		fmt.Printf("runVmTests: %q\n", vm.instructions)
+		// fmt.Printf("runVmTests: %q\n", vm.instructions)
 		// run the vm
 		err = vm.Run()
 		if err != nil {
