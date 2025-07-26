@@ -24,6 +24,8 @@ const (
 	OpGreaterThan
 	OpMinus
 	OpBang
+	OpJumpNotTruthy
+	OpJump // jump no matter what
 )
 
 type Definition struct {
@@ -32,19 +34,21 @@ type Definition struct {
 }
 
 var definitions = map[Opcode]*Definition{
-	OpConstant:    {"OpConstant", []int{2}},
-	OpAdd:         {"OpAdd", []int{}},
-	OpPop:         {"OpPop", []int{}},
-	OpSub:         {"ObSub", []int{}},
-	OpMul:         {"OpMul", []int{}},
-	OpDiv:         {"OpDiv", []int{}},
-	OpTrue:        {"OpTrue", []int{}},
-	OpFalse:       {"OpFalse", []int{}},
-	OpEqual:       {"OpEqual", []int{}},
-	OpNotEqual:    {"OpNotEqual", []int{}},
-	OpGreaterThan: {"OpGreaterThan", []int{}},
-	OpMinus:       {"OpMinus", []int{}},
-	OpBang:        {"OpBang", []int{}},
+	OpConstant:      {"OpConstant", []int{2}},
+	OpAdd:           {"OpAdd", []int{}},
+	OpPop:           {"OpPop", []int{}},
+	OpSub:           {"ObSub", []int{}},
+	OpMul:           {"OpMul", []int{}},
+	OpDiv:           {"OpDiv", []int{}},
+	OpTrue:          {"OpTrue", []int{}},
+	OpFalse:         {"OpFalse", []int{}},
+	OpEqual:         {"OpEqual", []int{}},
+	OpNotEqual:      {"OpNotEqual", []int{}},
+	OpGreaterThan:   {"OpGreaterThan", []int{}},
+	OpMinus:         {"OpMinus", []int{}},
+	OpBang:          {"OpBang", []int{}},
+	OpJumpNotTruthy: {"OpJumpNotTruthy", []int{2}},
+	OpJump:          {"OpJump", []int{2}},
 }
 
 func Lookup(op byte) (*Definition, error) {
