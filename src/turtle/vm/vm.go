@@ -91,10 +91,36 @@ func (vm *VM) Run() error {
 
 		case code.OpPop:
 			vm.pop()
+
+		case code.OpJumpNotTruthy:
+			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
+
+			// go to the consequence by default
+			ip += 2
+
+			// go to the alternative or outside of the if-else
+			condition := vm.pop()
+			if !isTruthy(condition) {
+				ip = pos - 1
+			}
+
+		case code.OpJump:
+			// jump pass the alternative
+			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip = pos - 1
 		}
 
 	}
 	return nil
+}
+
+func isTruthy(condition object.Object) bool {
+	switch obj := condition.(type) {
+	case *object.Boolean:
+		return obj.Value
+	default:
+		return true
+	}
 }
 
 func (vm *VM) executeMinusOperator() error {
