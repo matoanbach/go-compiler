@@ -21,4 +21,4 @@ jobs:
 
     - name: Run tests
       working-directory: src/turtle/code
-      run: go test ./... 
+      run: go test -v ./compiler && go test -v ./vm && go test -v ./code 
