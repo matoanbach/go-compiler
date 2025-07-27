@@ -57,7 +57,7 @@ func Start(in io.Reader, out io.Writer) {
 }
 
 const TURTLE_FACE = `        
-	   _____     ____
+       _____     ____
       /      \  |  o | 
      |        |/ ___\| 
      |_________/     
