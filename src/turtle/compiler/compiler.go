@@ -166,6 +166,13 @@ func (c *Compiler) Compile(node ast.Node) error {
 		default:
 			return fmt.Errorf("unknown operator %s", node.Operator)
 		}
+
+	case *ast.LetStatement:
+		err := c.Compile(node.Value)
+		if err != nil {
+			return nil
+		}
+		c.emit(code.OpSetGlobal, len(c.constants)-1)
 	}
 	return nil
 }

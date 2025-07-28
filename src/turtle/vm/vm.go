@@ -124,6 +124,8 @@ func isTruthy(condition object.Object) bool {
 	switch obj := condition.(type) {
 	case *object.Boolean:
 		return obj.Value
+	case *object.Null:
+		return false
 	default:
 		return true
 	}
