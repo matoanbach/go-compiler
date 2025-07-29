@@ -127,7 +127,10 @@ func (vm *VM) Run() error {
 		case code.OpGetGlobal:
 			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
 			ip += 2
-			vm.push(vm.globals[globalIndex])
+			err := vm.push(vm.globals[globalIndex])
+			if err != nil {
+				return err
+			}
 		}
 
 	}
