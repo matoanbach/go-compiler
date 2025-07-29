@@ -275,6 +275,30 @@ func TestConditionals(t *testing.T) {
 	runCompilerTests(t, tests)
 }
 
+func TestStringExpression(t *testing.T) {
+	tests := []compilerTestCase{
+		{
+			input:             `"turtle"`,
+			expectedConstants: []interface{}{"turtle"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpPop),
+			},
+		},
+		{
+			input:             `"tur" + "tle"`,
+			expectedConstants: []interface{}{"tur", "tle"},
+			expectedInstructions: []code.Instructions{
+				code.Make(code.OpConstant, 0),
+				code.Make(code.OpConstant, 1),
+				code.Make(code.OpAdd),
+				code.Make(code.OpPop),
+			},
+		},
+	}
+	runCompilerTests(t, tests)
+}
+
 func runCompilerTests(t *testing.T, tests []compilerTestCase) {
 	t.Helper()
 
