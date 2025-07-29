@@ -17,6 +17,7 @@ type Compiler struct {
 	constants           []object.Object
 	lastInstruction     EmittedInstruction
 	previousInstruction EmittedInstruction
+	symbolTable         *SymbolTable
 }
 
 func New() *Compiler {
@@ -25,6 +26,7 @@ func New() *Compiler {
 		constants:           []object.Object{},
 		lastInstruction:     EmittedInstruction{},
 		previousInstruction: EmittedInstruction{},
+		symbolTable:         NewSymbolTable(),
 	}
 }
 
@@ -36,7 +38,6 @@ func (c *Compiler) Compile(node ast.Node) error {
 			if err != nil {
 				return err
 			}
-			c.emit(code.OpPop)
 		}
 
 	case *ast.ExpressionStatement:
@@ -44,6 +45,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if err != nil {
 			return err
 		}
+		c.emit(code.OpPop)
 
 	case *ast.Boolean:
 		if node.Value {
@@ -172,7 +174,17 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if err != nil {
 			return nil
 		}
-		c.emit(code.OpSetGlobal, len(c.constants)-1)
+		symbol := c.symbolTable.Define(node.Name.Value)
+		c.emit(code.OpSetGlobal, symbol.Index)
+		// if c.lastInstructionIsOpPop() {
+		// 	c.removeLastOpPop()
+		// }
+	case *ast.Identifier:
+		symbol, ok := c.symbolTable.Resolve(node.Value)
+		if !ok {
+			return fmt.Errorf("undefined variable %s", node.Value)
+		}
+		c.emit(code.OpGetGlobal, symbol.Index)
 	}
 	return nil
 }
