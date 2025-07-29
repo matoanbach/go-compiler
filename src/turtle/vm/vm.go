@@ -149,10 +149,44 @@ func (vm *VM) Run() error {
 			if err != nil {
 				return err
 			}
+
+		case code.OpHash:
+			noElements := int(code.ReadUint16(vm.instructions[ip+1:]))
+			ip += 2
+
+			hash, err := vm.buildHash(vm.sp-noElements, vm.sp)
+			vm.sp -= noElements
+			if err != nil {
+				return err
+			}
+
+			err = vm.push(hash)
+			if err != nil {
+				return err
+			}
+
 		}
 
 	}
 	return nil
+}
+
+func (vm *VM) buildHash(startIndex, endIndex int) (object.Object, error) {
+	hashPairs := make(map[object.HashKey]object.HashPair)
+
+	for i := startIndex; i < endIndex; i += 2 {
+		key := vm.stack[i]
+		value := vm.stack[i+1]
+
+		pair := object.HashPair{Key: key, Value: value}
+		hashKey, ok := key.(object.Hashable)
+		if !ok {
+			return nil, fmt.Errorf("unusable as hash key: %s", key.Type())
+		}
+		hashPairs[hashKey.HashKey()] = pair
+	}
+
+	return &object.Hash{Pairs: hashPairs}, nil
 }
 
 func (vm *VM) buildArray(startIndex, endIndex int) object.Object {
