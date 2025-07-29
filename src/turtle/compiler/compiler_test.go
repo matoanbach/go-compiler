@@ -329,7 +329,7 @@ func TestArrayLiterals(t *testing.T) {
 				code.Make(code.OpAdd),
 				code.Make(code.OpConstant, 2),
 				code.Make(code.OpConstant, 3),
-				code.Make(code.OpMinus),
+				code.Make(code.OpSub),
 				code.Make(code.OpConstant, 4),
 				code.Make(code.OpConstant, 5),
 				code.Make(code.OpMul),
