@@ -161,6 +161,10 @@ func (c *Compiler) Compile(node ast.Node) error {
 		integer := &object.Integer{Value: node.Value}
 		c.emit(code.OpConstant, c.addConstant(integer))
 
+	case *ast.StringLiteral:
+		st := &object.String{Value: node.Value}
+		c.emit(code.OpConstant, c.addConstant(st))
+
 	case *ast.PrefixExpression:
 		err := c.Compile(node.Right)
 		if err != nil {
