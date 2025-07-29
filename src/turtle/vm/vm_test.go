@@ -96,7 +96,7 @@ func TestStringExpressions(t *testing.T) {
 	tests := []vmTestCase{
 		{`"turtle"`, "turtle"},
 		{`"tur" + "tle"`, "turtle"},
-		{`"tur"` + "tle" + "trees", "turtletrees"},
+		{`"tur" + "tle" + "trees"`, "turtletrees"},
 	}
 
 	runVmTests(t, tests)
@@ -167,7 +167,7 @@ func testStringObject(expected string, actual object.Object) error {
 	}
 
 	if result.Value != expected {
-		return fmt.Errorf("object has wrong value. expected=%s, got=%s", expected, result.Value)
+		return fmt.Errorf("object has wrong value. expected=%q, got=%q", expected, result.Value)
 	}
 
 	return nil
