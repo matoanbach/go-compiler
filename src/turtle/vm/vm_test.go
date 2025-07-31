@@ -181,6 +181,8 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 		// testExpectedObject(t, tt.expected, stackElem)
 
 		stackElem := vm.LastPoppedStackElem()
+		// fmt.Printf("tt.instructions: %+v", comp.Bytecode().Instructions)
+		// fmt.Printf("tt.input: %+v", tt.input)
 		testExpectedObject(t, tt.expected, stackElem)
 	}
 }
