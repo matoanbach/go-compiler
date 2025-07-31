@@ -14,14 +14,20 @@ type EmittedInstruction struct {
 }
 
 type Compiler struct {
-	instructions        code.Instructions
-	constants           []object.Object
-	lastInstruction     EmittedInstruction
-	previousInstruction EmittedInstruction
-	symbolTable         *SymbolTable
+	constants []object.Object
+
+	symbolTable *SymbolTable
 
 	scopes     []CompilationScope
 	scopeIndex int
+}
+
+func (c *Compiler) leaveScope() {
+	panic("unimplemented")
+}
+
+func (c *Compiler) enterScope() {
+	panic("unimplemented")
 }
 
 type CompilationScope struct {
@@ -31,12 +37,18 @@ type CompilationScope struct {
 }
 
 func New() *Compiler {
-	return &Compiler{
+	mainScope := CompilationScope{
 		instructions:        code.Instructions{},
-		constants:           []object.Object{},
 		lastInstruction:     EmittedInstruction{},
 		previousInstruction: EmittedInstruction{},
-		symbolTable:         NewSymbolTable(),
+	}
+	return &Compiler{
+		constants:   []object.Object{},
+		symbolTable: NewSymbolTable(),
+		scopes: []CompilationScope{
+			mainScope,
+		},
+		scopeIndex: 0,
 	}
 }
 
