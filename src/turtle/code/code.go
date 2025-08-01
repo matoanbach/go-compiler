@@ -35,6 +35,8 @@ const (
 	OpCall
 	OpReturnValue
 	OpReturn
+	OpSetLocal
+	OpGetLocal
 )
 
 type Definition struct {
@@ -67,6 +69,8 @@ var definitions = map[Opcode]*Definition{
 	OpCall:          {"OpCall", []int{}},
 	OpReturn:        {"OpReturn", []int{}},
 	OpReturnValue:   {"OpReturnValue", []int{}},
+	OpSetLocal:      {"OpSetLocal", []int{1}},
+	OpGetLocal:      {"OpGetLocal", []int{1}},
 }
 
 func Lookup(op byte) (*Definition, error) {
