@@ -9,28 +9,37 @@ import (
 
 const StackSize = 2048
 const GlobalSize = 65536
+const MaxFrames = 1024
 
 var True = &object.Boolean{Value: true}
 var False = &object.Boolean{Value: false}
 var Null = &object.Null{}
 
 type VM struct {
-	constants    []object.Object
-	instructions code.Instructions
+	constants []object.Object
 
 	stack []object.Object
 	sp    int
 
 	globals []object.Object
+
+	frames      []*Frame
+	framesIndex int
 }
 
 func New(bytecode *compiler.Bytecode) *VM {
+	mainFn := &object.CompiledFunction{Instructions: bytecode.Instructions}
+	mainFrame := NewFrame(mainFn)
+
+	frames := make([]*Frame, MaxFrames)
+	frames[0] = mainFrame
 	return &VM{
-		constants:    bytecode.Constants,
-		instructions: bytecode.Instructions,
-		stack:        make([]object.Object, StackSize),
-		sp:           0,
-		globals:      make([]object.Object, GlobalSize),
+		constants:   bytecode.Constants,
+		stack:       make([]object.Object, StackSize),
+		sp:          0,
+		globals:     make([]object.Object, GlobalSize),
+		frames:      frames,
+		framesIndex: 1,
 	}
 }
 
@@ -48,9 +57,17 @@ func (vm *VM) StackTop() object.Object {
 }
 
 func (vm *VM) Run() error {
-	for ip := 0; ip < len(vm.instructions); ip++ {
+	var ip int
+	var ins code.Instructions
+	var op code.Opcode
+
+	for vm.currentFrame().ip < len(vm.currentFrame().Instructions())-1 {
 		// fetch
-		op := code.Opcode(vm.instructions[ip])
+		vm.currentFrame().ip++
+
+		ip = vm.currentFrame().ip
+		ins = vm.currentFrame().Instructions()
+		op = code.Opcode(ins[ip])
 
 		switch op {
 		// decode
@@ -400,4 +417,18 @@ func (vm *VM) pop() object.Object {
 	obj := vm.stack[vm.sp-1]
 	vm.sp--
 	return obj
+}
+
+func (vm *VM) currentFrame() *Frame {
+	return vm.frames[vm.framesIndex-1]
+}
+
+func (vm *VM) pushFrame(f *Frame) {
+	vm.frames[vm.framesIndex] = f
+	vm.framesIndex++
+}
+
+func (vm *VM) popFrame() *Frame {
+	vm.framesIndex--
+	return vm.frames[vm.framesIndex]
 }
