@@ -72,7 +72,7 @@ func (vm *VM) Run() error {
 		switch op {
 		// decode
 		case code.OpConstant:
-			constIndex := code.ReadUint16(vm.instructions[ip+1:])
+			constIndex := code.ReadUint16(ins[ip+1:])
 			ip += 2
 
 			// execute
@@ -126,7 +126,7 @@ func (vm *VM) Run() error {
 			vm.pop()
 
 		case code.OpJumpNotTruthy:
-			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
+			pos := int(code.ReadUint16(ins[ip+1:]))
 
 			// go to the consequence by default
 			ip += 2
@@ -139,16 +139,16 @@ func (vm *VM) Run() error {
 
 		case code.OpJump:
 			// jump pass the alternative
-			pos := int(code.ReadUint16(vm.instructions[ip+1:]))
+			pos := int(code.ReadUint16(ins[ip+1:]))
 			ip = pos - 1
 
 		case code.OpSetGlobal:
-			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			globalIndex := code.ReadUint16(ins[ip+1:])
 			ip += 2
 			vm.globals[globalIndex] = vm.pop()
 
 		case code.OpGetGlobal:
-			globalIndex := code.ReadUint16(vm.instructions[ip+1:])
+			globalIndex := code.ReadUint16(ins[ip+1:])
 			ip += 2
 			err := vm.push(vm.globals[globalIndex])
 			if err != nil {
@@ -156,7 +156,7 @@ func (vm *VM) Run() error {
 			}
 
 		case code.OpArray:
-			noElements := int(code.ReadUint16(vm.instructions[ip+1:]))
+			noElements := int(code.ReadUint16(ins[ip+1:]))
 			ip += 2
 
 			array := vm.buildArray(vm.sp-noElements, vm.sp)
@@ -168,7 +168,7 @@ func (vm *VM) Run() error {
 			}
 
 		case code.OpHash:
-			noElements := int(code.ReadUint16(vm.instructions[ip+1:]))
+			noElements := int(code.ReadUint16(ins[ip+1:]))
 			ip += 2
 
 			hash, err := vm.buildHash(vm.sp-noElements, vm.sp)
