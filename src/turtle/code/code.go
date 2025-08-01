@@ -103,6 +103,8 @@ func Make(op Opcode, operands ...int) []byte {
 		switch width {
 		case 2:
 			binary.BigEndian.PutUint16(instruction[offset:], uint16(operand))
+		case 1:
+			instruction[offset] = byte(operand)
 		}
 		offset += width
 	}
@@ -116,6 +118,8 @@ func ReadOperands(def *Definition, instruction Instructions) ([]int, int) {
 
 	for i, width := range def.OperandWidths {
 		switch width {
+		case 1:
+			operands[i] = int(ReadUint8(instruction[offset:]))
 		case 2:
 			operands[i] = int(ReadUint16(instruction[offset:]))
 		}
@@ -124,6 +128,9 @@ func ReadOperands(def *Definition, instruction Instructions) ([]int, int) {
 	return operands, offset
 }
 
+func ReadUint8(instruction Instructions) uint8 {
+	return byte(instruction[0])
+}
 func ReadUint16(instruction Instructions) uint16 {
 	return binary.BigEndian.Uint16(instruction)
 }
