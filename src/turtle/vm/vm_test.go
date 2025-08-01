@@ -216,7 +216,7 @@ func TestFunctionsWithoutReturnValue(t *testing.T) {
 		{
 			input: `
 			let noReturn = fn() { };
-			let noReturnValue = fn() { noReturn(); };
+			let noReturnTwo = fn() { noReturn(); };
 			noReturn();
 			noReturnTwo(); 
 			`,
