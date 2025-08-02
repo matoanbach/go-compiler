@@ -56,9 +56,15 @@ func New() *Compiler {
 		lastInstruction:     EmittedInstruction{},
 		previousInstruction: EmittedInstruction{},
 	}
+
+	symbolTable := NewSymbolTable()
+	for i, b := range object.Builtins {
+		symbolTable.DefineBuiltin(i, b.Name)
+	}
+
 	return &Compiler{
 		constants:   []object.Object{},
-		symbolTable: NewSymbolTable(),
+		symbolTable: symbolTable,
 		scopes: []CompilationScope{
 			mainScope,
 		},
@@ -71,6 +77,17 @@ func NewWithState(s *SymbolTable, constants []object.Object) *Compiler {
 	compiler.symbolTable = s
 	compiler.constants = constants
 	return compiler
+}
+
+func (c *Compiler) loadSymbol(s Symbol) {
+	switch s.Scope {
+	case GlobalScope:
+		c.emit(code.OpGetGlobal, s.Index)
+	case LocalScope:
+		c.emit(code.OpGetLocal, s.Index)
+	case BuiltinScope:
+		c.emit(code.OpGetBuiltin, s.Index)
+	}
 }
 
 func (c *Compiler) Compile(node ast.Node) error {
