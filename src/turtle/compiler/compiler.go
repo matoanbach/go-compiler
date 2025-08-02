@@ -308,7 +308,11 @@ func (c *Compiler) Compile(node ast.Node) error {
 		numLocals := c.symbolTable.numDefinitions
 		instructions := c.leaveScope()
 
-		comfiledFunction := &object.CompiledFunction{Instructions: instructions, NumLocals: numLocals}
+		comfiledFunction := &object.CompiledFunction{
+			Instructions:  instructions,
+			NumLocals:     numLocals,
+			NumParameters: len(node.Parameters),
+		}
 		c.emit(code.OpConstant, c.addConstant(comfiledFunction))
 
 	case *ast.ReturnStatement:
