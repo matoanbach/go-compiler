@@ -608,7 +608,7 @@ func TestFunctionCalls(t *testing.T) {
 			`,
 			expectedConstants: []interface{}{
 				[]code.Instructions{
-					code.Make(code.OpPop),
+					code.Make(code.OpReturn),
 				},
 				24,
 			},
@@ -747,7 +747,6 @@ func runCompilerTests(t *testing.T, tests []compilerTestCase) {
 		}
 
 		bytecode := compiler.Bytecode()
-
 		err = testInstructions(tt.expectedInstructions, bytecode.Instructions)
 		if err != nil {
 			t.Fatalf("testInstructions failed: %s", err)
