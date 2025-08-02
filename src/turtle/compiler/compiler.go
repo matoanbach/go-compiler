@@ -300,9 +300,11 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if !c.lastInstructionIs(code.OpReturnValue) {
 			c.emit(code.OpReturn)
 		}
+
+		numLocals := c.symbolTable.numDefinitions
 		instructions := c.leaveScope()
 
-		comfiledFunction := &object.CompiledFunction{Instructions: instructions}
+		comfiledFunction := &object.CompiledFunction{Instructions: instructions, NumLocals: numLocals}
 		c.emit(code.OpConstant, c.addConstant(comfiledFunction))
 
 	case *ast.ReturnStatement:
@@ -318,8 +320,14 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if err != nil {
 			return err
 		}
+		for _, argument := range node.Arguments {
+			err := c.Compile(argument)
+			if err != nil {
+				return err
+			}
+		}
 
-		c.emit(code.OpCall)
+		c.emit(code.OpCall, len(node.Arguments))
 	}
 	return nil
 }
