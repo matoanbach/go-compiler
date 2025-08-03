@@ -35,6 +35,16 @@ func NewEnclosedSymbolTable(outer *SymbolTable) *SymbolTable {
 	return s
 }
 
+func (s *SymbolTable) defineFree(original Symbol) Symbol {
+	s.FreeSymbols = append(s.FreeSymbols, original)
+
+	symbol := Symbol{Name: original.Name, Index: len(s.FreeSymbols) - 1}
+	symbol.Scope = FreeScope
+
+	s.store[symbol.Name] = symbol
+	return symbol
+}
+
 func (s *SymbolTable) Define(name string) Symbol {
 	symbol := Symbol{Name: name, Index: s.numDefinitions}
 	if s.Outer == nil {
