@@ -83,3 +83,9 @@ func (s *SymbolTable) DefineBuiltin(index int, name string) Symbol {
 	s.store[name] = symbol
 	return symbol
 }
+
+func (s *SymbolTable) DefineFunctionName(name string) Symbol {
+	symbol := Symbol{Name: name, Index: 0, Scope: FunctionScope}
+	s.store[name] = symbol
+	return symbol
+}
