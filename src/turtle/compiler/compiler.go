@@ -319,9 +319,13 @@ func (c *Compiler) Compile(node ast.Node) error {
 		if !c.lastInstructionIs(code.OpReturnValue) {
 			c.emit(code.OpReturn)
 		}
-
+		freeSymbols := c.symbolTable.FreeSymbols
 		numLocals := c.symbolTable.numDefinitions
 		instructions := c.leaveScope()
+
+		for _, s := range freeSymbols {
+			c.loadSymbol(s)
+		}
 
 		comfiledFunction := &object.CompiledFunction{
 			Instructions:  instructions,
@@ -329,7 +333,7 @@ func (c *Compiler) Compile(node ast.Node) error {
 			NumParameters: len(node.Parameters),
 		}
 		functionIndex := c.addConstant(comfiledFunction)
-		c.emit(code.OpClosure, functionIndex, 0)
+		c.emit(code.OpClosure, functionIndex, len(freeSymbols))
 
 	case *ast.ReturnStatement:
 		err := c.Compile(node.ReturnValue)
