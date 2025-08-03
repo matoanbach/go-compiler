@@ -284,7 +284,7 @@ func (vm *VM) pushClosure(constIndex int, numFree int) error {
 	}
 	vm.sp = vm.sp - numFree
 
-	closure := &object.Closure{Fn: function}
+	closure := &object.Closure{Fn: function, Free: free}
 	return vm.push(closure)
 }
 
