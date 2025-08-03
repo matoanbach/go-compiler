@@ -510,6 +510,22 @@ func TestRecursiveFunctions(t *testing.T) {
         `,
 			expected: 0,
 		},
+		{
+			input: `
+        let wrapper = fn() {
+            let countDown = fn(x) {
+                if (x == 0) {
+                    return 0;
+                } else {
+                    countDown(x - 1);
+                }
+            };
+            countDown(1);
+        };
+        wrapper();
+        `,
+			expected: 0,
+		},
 	}
 
 	runVmTests(t, tests)
@@ -519,33 +535,36 @@ func runVmTests(t *testing.T, tests []vmTestCase) {
 	t.Helper()
 
 	for _, tt := range tests {
-		// get the ast program
 		program := parse(tt.input)
 
-		// init the compiler
 		comp := compiler.New()
 
-		// run the compiler on the ast program
 		err := comp.Compile(program)
 		if err != nil {
 			t.Fatalf("compiler err: %s", err)
 		}
-		// init the vm (not implemented yet)
+
+		for i, constant := range comp.Bytecode().Constants {
+			fmt.Printf("CONSTANT %d %p (%T):\n", i, constant, constant)
+
+			switch constant := constant.(type) {
+			case *object.CompiledFunction:
+				fmt.Printf(" Instructions:\n%s", constant.Instructions)
+			case *object.Integer:
+				fmt.Printf(" Value: %d\n", constant.Value)
+			}
+
+			fmt.Printf("\n")
+		}
+
 		vm := New(comp.Bytecode())
-		// fmt.Printf("runVmTests: %q\n", vm.instructions)
-		// run the vm
+
 		err = vm.Run()
 		if err != nil {
 			t.Fatalf("vm err: %s", err)
 		}
 
-		// get the first element in the stack
-		// stackElem := vm.StackTop()
-		// testExpectedObject(t, tt.expected, stackElem)
-
 		stackElem := vm.LastPoppedStackElem()
-		// fmt.Printf("tt.instructions: %+v", comp.Bytecode().Instructions)
-		// fmt.Printf("tt.input: %+v", tt.input)
 		testExpectedObject(t, tt.expected, stackElem)
 	}
 }
