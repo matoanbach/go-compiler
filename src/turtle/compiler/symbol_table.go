@@ -19,11 +19,14 @@ type SymbolTable struct {
 	Outer          *SymbolTable
 	store          map[string]Symbol
 	numDefinitions int
+
+	FreeSymbols []Symbol
 }
 
 func NewSymbolTable() *SymbolTable {
 	s := make(map[string]Symbol)
-	return &SymbolTable{store: s}
+	free := []Symbol{}
+	return &SymbolTable{store: s, FreeSymbols: free}
 }
 
 func NewEnclosedSymbolTable(outer *SymbolTable) *SymbolTable {
